@@ -4,16 +4,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>YOUR NAME Grocery</title>
+<title>Sam and Alex's- Products</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+                <div class="container-fluid">
+                
+                  <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                      <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="shop.html">Home</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="listprod.jsp">View Products</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="listorder.jsp">List All Orders</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="showcart.jsp">View Cart</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
 
-<h1>Search for the products you want to buy:</h1>
-
+<h1 align="center">Search for the Products You Want to Buy</h1>
+<div align="center">
 <form method="get" action="listprod.jsp">
 <input type="text" name="productName" size="50">
 <input type="submit" value="Submit"><input type="reset" value="Reset"> (Leave blank for all products)
 </form>
+</div>
+
 
 <% // Get product name to search for
 String name = request.getParameter("productName");
@@ -82,6 +106,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);)
 	catch (SQLException ex)
 	{
 		out.println("We ran into some trouble. Please try again later.");
+		out.println("SQLException: " + ex);
 		System.err.println("SQLException: " + ex);
 	}
 
