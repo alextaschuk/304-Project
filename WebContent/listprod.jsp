@@ -89,11 +89,12 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);)
 		while (rs.next())
 		{
 
-			String link = "addcart.jsp?id=" + rs.getInt("productId") + "&name=" +rs.getString("productName") + "&price=" + rs.getDouble("productPrice");
+			String addCartLink = "addcart.jsp?id=" + rs.getInt("productId") + "&name=" +rs.getString("productName") + "&price=" + rs.getDouble("productPrice");
+			String productLink = "product.jsp?productId=" + rs.getInt("productId");
 
 			out.println("<tr>");
-				out.println("<td><a href=\"" + link + "\">Add to Cart</a></td>");
-				out.println("<td>" + rs.getString("productName") + "</td>");
+				out.println("<td><a href=\"" + addCartLink + "\">Add to Cart</a></td>");
+				out.println("<td><a href=\"" + productLink + "\">" + rs.getString("productName") + "</a></td>");
 				out.println("<td>" + currFormat.format(rs.getDouble("productPrice")) + "</td>");
 			out.println("</tr>");
 
