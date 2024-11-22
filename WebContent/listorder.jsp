@@ -25,7 +25,7 @@
                   <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                       <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="shop.html">Home</a>
+                        <a class="nav-link active" aria-current="page" href="index.jsp">Home</a>
                       </li>
                       <li class="nav-item">
                         <a class="nav-link" href="listprod.jsp">View Products</a>
