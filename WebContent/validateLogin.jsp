@@ -30,10 +30,22 @@
 		if((username.length() == 0) || (password.length() == 0))
 				return null;
 
+		String queryUsername = "SELECT userid FROM customer WHERE userid LIKE ?"; // Check if given username matches one in DB
 		try 
 		{
 			getConnection();
-			
+			PreparedStatement pstmt = con.prepareStatement(queryUsername);
+			pstmt.setString(1, username);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			if(!rs.next()){ // if there is no match (i.e., not a valid username)
+				retStr = ""; // don't login
+			} else {
+				retStr = "username"; // login
+			}
+
+
 			// TODO: Check if userId and password match some customer account. If so, set retStr to be the username.
 			retStr = "";			
 		} 

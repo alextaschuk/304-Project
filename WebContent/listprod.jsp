@@ -9,32 +9,32 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
-                <div class="container-fluid">
-                
-                  <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                      <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.jsp">Home</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="listprod.jsp">View Products</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="listorder.jsp">List All Orders</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="showcart.jsp">View Cart</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </nav>
+				<div class="container-fluid">
+				
+				  <div class="collapse navbar-collapse" id="navbarNav">
+					<ul class="navbar-nav">
+					  <li class="nav-item">
+						<a class="nav-link active" aria-current="page" href="index.jsp">Home</a>
+					  </li>
+					  <li class="nav-item">
+						<a class="nav-link" href="listprod.jsp">View Products</a>
+					  </li>
+					  <li class="nav-item">
+						<a class="nav-link" href="listorder.jsp">List All Orders</a>
+					  </li>
+					  <li class="nav-item">
+						<a class="nav-link" href="showcart.jsp">View Cart</a>
+					  </li>
+					</ul>
+				  </div>
+				</div>
+			  </nav>
 
 <h1 align="center">Search for the Products You Want to Buy</h1>
 <div align="center">
 <form method="get" action="listprod.jsp">
-<input type="text" name="productName" size="50">
-<input type="submit" value="Submit"><input type="reset" value="Reset"> (Leave blank for all products)
+<input type="text" placeholder="Leave blank for all products" name="productName" size="50">
+<input type="submit" value="Submit"><input type="reset" value="Reset">
 </form>
 </div>
 
@@ -68,12 +68,15 @@ if (searchString == null) {
 	sql = "SELECT * FROM product WHERE productName LIKE '%' + ? + '%'";
 }
 
-out.println("<table>");
+out.println("<table class='table table-striped'>");
+out.println("<thead>");
 out.println("<tr>");
-	out.println("<th></th>");
 	out.println("<th>Product Name</th>");
 	out.println("<th>Price</th>");
+	out.println("<th></th>");
 out.println("</tr>");
+out.println("</thead>");
+out.println("<tbody>");
 
 try (Connection con = DriverManager.getConnection(url, uid, pw);)
 	{			
@@ -93,13 +96,21 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);)
 			String productLink = "product.jsp?productId=" + rs.getInt("productId");
 
 			out.println("<tr>");
-				out.println("<td><a href=\"" + addCartLink + "\">Add to Cart</a></td>");
 				out.println("<td><a href=\"" + productLink + "\">" + rs.getString("productName") + "</a></td>");
 				out.println("<td>" + currFormat.format(rs.getDouble("productPrice")) + "</td>");
+				out.println("<td>");
+				out.println("<form method=\"get\" action=\"addcart.jsp\">");
+				out.println("<input type=\"hidden\" name=\"id\" value=\"" + rs.getInt("productId") + "\">");
+				out.println("<input type=\"hidden\" name=\"name\" value=\"" + rs.getString("productName") + "\">");
+				out.println("<input type=\"hidden\" name=\"price\" value=\"" + rs.getDouble("productPrice") + "\">");
+				out.println("<input type=\"submit\" value=\"Add to Cart\" class=\"btn btn-primary\">");
+				out.println("</form>");
+				out.println("</td>");
 			out.println("</tr>");
 
 		}
 
+		out.println("</tbody>");
 		out.println("</table>");
 
 

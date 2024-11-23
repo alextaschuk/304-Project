@@ -29,7 +29,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);) {
 
 
 
-    PreparedStatement ps = con.prepareStatement(sql);
+    PreparedStatement ps = con.prepareStatement(sql); // use prepared statement to retrieve and display product info
     ps.setString(1, productId);
     ResultSet rs = ps.executeQuery();
 
@@ -46,7 +46,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);) {
         if (productImageURL != null) out.println("<img src=\"" + productImageURL + "\" alt=\"" + productName + "\">");
 
         byte[] productImage = rs.getBytes("productImage");
-        if(productImage != null) out.println("<img src=\"displayImage.jsp?id=" + productId + "\" alt=\"" + productName + "\">");
+        if(productImage != null) out.println("<img src=\"displayImage.jsp?id=" + productId + "\" alt=\"" + productName + "\">"); // use img tag to show product image
         
         NumberFormat currFormat = NumberFormat.getCurrencyInstance();
         out.println("<p><b>Id:</b> " + productId + "</p>");
@@ -54,8 +54,8 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);) {
 
         // TODO: Add links to Add to Cart and Continue Shopping
         String addCartLink = "addcart.jsp?id=" + rs.getInt("productId") + "&name=" +rs.getString("productName") + "&price=" + rs.getDouble("productPrice");
-        out.println("<h3><a href=\"" + addCartLink + "\">Add to Cart</a> <br />");
-        out.println("<a href=\"listprod.jsp\">Continue Shopping</a></h3>");
+        out.println("<h3><button onclick=\"location.href='" + addCartLink + "'\">Add to Cart</button> <br />"); // Add to Cart button
+        out.println("<button onclick=\"location.href='listprod.jsp'\">Continue Shopping</button></h3>"); // Continue Shopping button
 
     } else {
         out.println("Product not found");
