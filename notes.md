@@ -5,7 +5,7 @@
 
 **To use the website**
 
-1. Go to http://127.0.0.1/shop/shop.html
+1. Go to http://127.0.0.1/shop/index.jsp
 
 
 

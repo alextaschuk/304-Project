@@ -30,24 +30,25 @@
 		if((username.length() == 0) || (password.length() == 0))
 				return null;
 
-		String queryUsername = "SELECT userid FROM customer WHERE userid LIKE ?"; // Check if given username matches one in DB
+		String sql = "SELECT userid, password FROM customer WHERE userid = ? AND password = ? AND customerId = (SELECT customerId FROM customer WHERE userid = ? AND password = ?)";
+	
 		try 
 		{
 			getConnection();
-			PreparedStatement pstmt = con.prepareStatement(queryUsername);
+			PreparedStatement pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, username);
+			pstmt.setString(2, password);
+			pstmt.setString(3, username);
+			pstmt.setString(4, password);
 
 			ResultSet rs = pstmt.executeQuery();
 
 			if(!rs.next()){ // if there is no match (i.e., not a valid username)
-				retStr = ""; // don't login
+				return null; // don't login
 			} else {
-				retStr = "username"; // login
+				retStr = username; // login
 			}
 
-
-			// TODO: Check if userId and password match some customer account. If so, set retStr to be the username.
-			retStr = "";			
 		} 
 		catch (SQLException ex) {
 			out.println(ex);
@@ -55,15 +56,14 @@
 		finally
 		{
 			closeConnection();
-		}	
-		
-		if(retStr != null)
-		{	session.removeAttribute("loginMessage");
-			session.setAttribute("authenticatedUser",username);
 		}
-		else
-			session.setAttribute("loginMessage","Could not connect to the system using that username/password.");
-
+		
+		if(retStr != null){	
+			session.removeAttribute("loginMessage");
+			session.setAttribute("authenticatedUser",username);
+		} else {
+			session.setAttribute("loginMessage", "Could not connect to the system using that username/password.");
+		}
 		return retStr;
 	}
 %>

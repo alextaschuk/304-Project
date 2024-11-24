@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Login Screen</title>
+<title>Sign In Screen</title>
 </head>
 <body>
 
 <div style="margin:0 auto;text-align:center;display:inline">
 
-<h3>Please Login to System</h3>
+<h3>Sign In To Account</h3>
 
 <%
 // Print prior error login message if present
 if (session.getAttribute("loginMessage") != null)
 	out.println("<p>"+session.getAttribute("loginMessage").toString()+"</p>");
 %>
+
 
 <br>
 <form name="MyForm" method=post action="validateLogin.jsp">
