@@ -6,15 +6,23 @@
 <body>
 
 <div style="margin:0 auto;text-align:center;display:inline">
+<%@ include file="header.jsp" %>
 
 <h3>Sign In To Account</h3>
 
 <%
-// Print prior error login message if present
-if (session.getAttribute("loginMessage") != null)
-	out.println("<p>"+session.getAttribute("loginMessage").toString()+"</p>");
-%>
+String user = (String)session.getAttribute("authenticatedUser");
+boolean authenticated = session.getAttribute("authenticatedUser") == null ? false : true;
 
+// Print prior error login message if present
+ if (session.getAttribute("redirectedToLogin") != null && (boolean) session.getAttribute("redirectedToLogin") && session.getAttribute("loginMessage") != null) {
+        out.println("<p>" + session.getAttribute("loginMessage").toString() + "</p>");
+        // Reset the redirected flag
+        session.setAttribute("redirectedToLogin", false);
+    } else 
+		out.println("<p>" + session.getAttribute("loginMessage").toString() + "</p>");
+
+%>
 
 <br>
 <form name="MyForm" method=post action="validateLogin.jsp">

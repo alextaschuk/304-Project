@@ -13,8 +13,11 @@
 
 	if(authenticatedUser != null)
 		response.sendRedirect("index.jsp");		// Successful login
-	else
+	else{
+		session.setAttribute("loginMessage", "Could not connect to the system using that username/password. Please try again.");
 		response.sendRedirect("login.jsp");		// Failed login - redirect back to login page with a message 
+	}
+		
 %>
 
 
@@ -26,9 +29,10 @@
 		String retStr = null;
 
 		if(username == null || password == null)
-				return null;
+			session.setAttribute("loginMessage", "Could not connect to the system using that username/password. Please try again.");
 		if((username.length() == 0) || (password.length() == 0))
-				return null;
+			session.setAttribute("loginMessage", "Could not connect to the system using that username/password. Please try again.");
+
 
 		String sql = "SELECT userid, password FROM customer WHERE userid = ? AND password = ? AND customerId = (SELECT customerId FROM customer WHERE userid = ? AND password = ?)";
 	
@@ -60,9 +64,9 @@
 		
 		if(retStr != null){	
 			session.removeAttribute("loginMessage");
-			session.setAttribute("authenticatedUser",username);
+			session.setAttribute("authenticatedUser",retStr);
 		} else {
-			session.setAttribute("loginMessage", "Could not connect to the system using that username/password.");
+			session.setAttribute("loginMessage", "Could not connect to the system using that username/password. Please try again.");
 		}
 		return retStr;
 	}

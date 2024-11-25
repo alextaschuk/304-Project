@@ -1,106 +1,115 @@
 <%@ page import="java.sql.*" %>
+<%@ page import="java.text.NumberFormat" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="java.util.Date" %>
+<%@ include file="jdbc.jsp" %>
 
 <html>
 <head>
-    <title>Grocery Shipment Processing</title>
+<title>Sam & Alex's Grocery Shipment Processing</title>
 </head>
 <body>
+        
+<%@ include file="header.jsp" %>
 
 <%
-    String orderId = request.getParameter("orderId");
-    if (orderId == null || orderId.trim().isEmpty()) {
-        out.println("<p>Error: Invalid or missing Order ID.</p>");
-        return;
-    }
+	// TODO: Get order id
+        String orderId = request.getParameter("orderId");
+	
+	// TODO: Check if valid order id in database
+	if (orderId == null || orderId.trim().isEmpty()) {
+		throw new IllegalArgumentException("Invalid order ID.");
+	}
 
-    String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";
-    String uid = "sa";
-    String pw = "304#sa#pw";
+	String url = "jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True";
+	String uid = "sa";
+	String pw = "304#sa#pw";
 
-    try (Connection con = DriverManager.getConnection(url, uid, pw)) {
-        con.setAutoCommit(false);
+	
+	Connection con = null;
+	int productId = 0;
+	try {
+		con = DriverManager.getConnection(url, uid, pw);
 
-        // Check if order exists
-        String checkOrderSQL = "SELECT productId, quantity FROM orderproduct WHERE orderID = ?";
-        PreparedStatement checkOrderStmt = con.prepareStatement(checkOrderSQL);
-        checkOrderStmt.setString(1, orderId);
-        ResultSet orderItems = checkOrderStmt.executeQuery();
-        if (!orderItems.isBeforeFirst()) {
-            out.println("<p>Error: Order ID not found in the database.</p>");
-            return;
-        }
+		// TODO: Start a transaction (turn-off auto-commit)
+		con.setAutoCommit(false);
+		
+		// TODO: Retrieve all items in order with given id
+		String selectAllOrderProductsWithGivenId = "SELECT * FROM orderproduct WHERE orderId = ?";
+		PreparedStatement orderedProductsStatement = con.prepareStatement(selectAllOrderProductsWithGivenId);
+		orderedProductsStatement.setString(1, orderId);
+		ResultSet orderedProducts = orderedProductsStatement.executeQuery();
 
-        // Insert a new shipment row
-        String insertShipmentSQL = "INSERT INTO shipment (shipmentId, shipmentDate, shipmentDesc, warehouseId) VALUES (?, ?, ?, ?)";
-        PreparedStatement insertShipmentStmt = con.prepareStatement(insertShipmentSQL, Statement.RETURN_GENERATED_KEYS);
-        insertShipmentStmt.setDate(1, new java.sql.Date(new Date().getTime()));
-        insertShipmentStmt.setString(2, "Shipment for Order ID: " + orderId);
-        insertShipmentStmt.setInt(3, 1);
-        insertShipmentStmt.executeUpdate();
+		if (!orderedProducts.isBeforeFirst()) {
+			throw new IllegalArgumentException("No products found for the given order ID.");
+		}
 
-        ResultSet generatedKeys = insertShipmentStmt.getGeneratedKeys();
-        int shipmentId;
-        if (generatedKeys.next()) {
-            shipmentId = generatedKeys.getInt(1);
-        } else {
-            out.println("<p>Error: Could not create shipment record.</p>");
-            con.rollback();
-            return;
-        }
-		int currentQuantity = 0;
-		int orderQuantity = 0;
-        // Validate inventory and update quantities
-        boolean hasError = false;
-        while (orderItems.next()) {
-            int productId = orderItems.getInt("productId");
-            orderQuantity = orderItems.getInt("quantity");
+		// TODO: Create a new shipment record.
+		String createNewShipment = "INSERT INTO shipment (shipmentDate, warehouseId) VALUES (GETDATE(), 1)";
+		PreparedStatement pstmt = con.prepareStatement(createNewShipment, Statement.RETURN_GENERATED_KEYS);
+		pstmt.executeUpdate();
 
-            String checkInventorySQL = "SELECT quantity FROM productInventory WHERE productId = ?";
-            PreparedStatement checkInventoryStmt = con.prepareStatement(checkInventorySQL);
-            checkInventoryStmt.setInt(1, productId);
-            ResultSet inventoryResult = checkInventoryStmt.executeQuery();
 
-            if (inventoryResult.next()) {
-                currentQuantity = inventoryResult.getInt("quantity");
-                if (currentQuantity < orderQuantity) {
-                    hasError = true;
-                    break;
-                } else {
-                    String updateInventorySQL = "UPDATE productInventory SET quantity = quantity - ? WHERE productId = ?";
-                    PreparedStatement updateInventoryStmt = con.prepareStatement(updateInventorySQL);
-                    updateInventoryStmt.setInt(1, orderQuantity);
-                    updateInventoryStmt.setInt(2, productId);
-                    updateInventoryStmt.executeUpdate();
-                }
-            } else {
-                hasError = true;
-                break;
-            }
-        }
 
-        if (hasError) {
-            // Rollback transaction and delete shipment row
-            String deleteShipmentSQL = "DELETE FROM shipment WHERE shipmentId = ?";
-            PreparedStatement deleteShipmentStmt = con.prepareStatement(deleteShipmentSQL);
-            deleteShipmentStmt.setInt(1, shipmentId);
-            deleteShipmentStmt.executeUpdate();
+		// TODO: For each item verify sufficient quantity available in warehouse 1.
+		String getInventoryInWarehouse = "SELECT quantity FROM productinventory WHERE warehouseId = 1 AND productId = ?";
+		int inWarehouseInventory = 0;
+		int orderQuantityRequest = 0;
+		int newInventory = 0;
+		while(orderedProducts.next()) {
 
-            con.rollback();
-            out.println("<p>Error: Insufficient inventory for one or more products. Shipment canceled.</p>");
-            return;
-        }
+			productId = orderedProducts.getInt("productId");
+			orderQuantityRequest = orderedProducts.getInt("quantity");
 
-        // Commit transaction if everything is successful
-        con.commit();
-		int newInventory = currentQuantity - orderQuantity;
-        out.println("<p>Ordered Product: " + shipmentId + " Qty: " + orderQuantity + " Previous Inventory: " + currentQuantity + " New Inventory:" + newInventory + " </p>");
+			PreparedStatement getInventoryInWarehouseStatement = con.prepareStatement(getInventoryInWarehouse);
+			getInventoryInWarehouseStatement.setInt(1, productId);
+			
+			ResultSet rs = getInventoryInWarehouseStatement.executeQuery();
 
-    } catch (SQLException e) {
-        e.printStackTrace();
-        out.println("<p>Error processing shipment. Please try again later.</p>");
-    }
-%>
+			rs.next();
+			inWarehouseInventory = rs.getInt("quantity");
+
+			// TODO: If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
+			if(inWarehouseInventory < orderQuantityRequest) throw new SQLException();
+			else {
+				newInventory = inWarehouseInventory - orderQuantityRequest;
+				out.println("<p>Ordered Product ID: " + productId + " Qty: " + orderQuantityRequest + " Previous inventory: " + inWarehouseInventory + " New Inventory: " + (newInventory) + "</p>");
+
+				// Update the prouctID's quantity with newInventory in productinventory table
+				String updateQuantity = "UPDATE productinventory SET quantity = ? WHERE productId = ?";
+				PreparedStatement update = con.prepareStatement(updateQuantity);
+				update.setInt(1, newInventory);
+				update.setInt(2, orderedProducts.getInt("productId"));
+				pstmt.executeUpdate();
+
+			}
+
+		}
+
+		
+		con.commit();
+
+	} catch (SQLException e){
+		if(con != null) {
+			con.rollback();
+			out.println("<h1>Shipment unsuccessful. Insufficient product inventory for product id: " + productId +  "</h1>");
+		}
+		
+		e.printStackTrace();
+	} catch (IllegalArgumentException e) {
+		out.println("<p>Invalid order ID.</p>");
+	} finally {
+		if(con != null) {
+			con.setAutoCommit(true);
+			con.close();
+		}
+	}
+	
+
+%>                       				
 
 <h2><a href="index.jsp">Back to Main Page</a></h2>
 

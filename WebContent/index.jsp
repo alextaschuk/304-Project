@@ -24,6 +24,10 @@
 
 <%
 	String userName = (String) session.getAttribute("authenticatedUser");
+  session.setAttribute("loginMessage", "");
+  session.setAttribute("redirectedToLogin", false);
+  
+
 	if (userName != null)
 		out.println("<h3 align=\"center\">Signed in as: "+userName+"</h3>");
 %>

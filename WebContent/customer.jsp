@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>Customer Page</title>
+ <%@ include file="header.jsp" %>
 <style>
 	body {
 		text-align: center;
@@ -11,19 +12,26 @@
 	}
 </style>
 </head>
+
 <body>
+ 
+
 <h3>Sign In To Account</h3>
 
-<%@ include file="auth.jsp"%>
+
+
+
 <%@ page import="java.text.NumberFormat" %>
 <%@ include file="jdbc.jsp" %>
 <%
-	authenticated = session.getAttribute("authenticatedUser") == null ? false : true; // if user is not logged in, show this message
-	if(!authenticated){
-		session.setAttribute("loginMessage","Please log in to view customer info.");        
-	} else { 
-		String userName = (String) session.getAttribute("authenticatedUser"); // otherwise, print customer info.
-	}
+	boolean userAuthenticated = session.getAttribute("authenticatedUser") == null ? false : true;    
+
+    if (!userAuthenticated) {
+    session.setAttribute("loginMessage", "Please log in to view customer information.");
+    session.setAttribute("redirectedToLogin", true);
+    response.sendRedirect("login.jsp");
+   return;
+}
 
 String sql = "SELECT customerId AS Id, firstName AS \"First Name\", lastName AS LastName, email AS Email, phonenum AS Phone, address AS Adress, city AS City, state AS State, postalCode AS \"Postal Code\", country AS Country, userid AS \"User id\" FROM customer WHERE userid LIKE ?";
 
