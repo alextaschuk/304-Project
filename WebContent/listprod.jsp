@@ -14,10 +14,16 @@
 <h1 align="center">Search for the Products You Want to Buy</h1>
 <div align="center">
 <form method="get" action="listprod.jsp">
-<input type="text" placeholder="Leave blank for all products" name="productName" size="50">
-<input type="submit" value="Submit"><input type="reset" value="Reset">
+<input type="text" id="searchbar" placeholder="Leave blank for all products" name="productName" size="50">
+<input type="submit" value="Submit"> 
+<input type="submit" value="Reset">
 </form>
 </div>
+<script>
+document.querySelector('input[type="reset"]').addEventListener('click', function() {
+	document.getElementById('searchbar').value = '';
+});
+</script>
 
 
 <% // Get product name to search for
@@ -42,7 +48,7 @@ String pw = "304#sa#pw";
 NumberFormat currFormat = NumberFormat.getCurrencyInstance();
 
 String sql;
-if (searchString == null) {
+if (searchString == null || searchString.length() == 0) {
 	sql = "SELECT * FROM product";
 } else {
 	out.println("<h1>Products containing '" + searchString + "'</h1>");
@@ -63,7 +69,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);)
 	{			
 		PreparedStatement pstmt = con.prepareStatement(sql);
 
-		if (searchString != null)
+		if (searchString != null && searchString.length() > 0)
 		{
 			pstmt.setString(1, searchString);
 		}
