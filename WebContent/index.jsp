@@ -25,13 +25,14 @@
     <%@ include file="header.jsp" %>
 
     <div class="container text-center">
-        <h1>Welcome to Sam and Alex's Grocery Depot</h1>
+        <h1>Welcome to Sam and Alex's Plushie Emporium</h1>
 
         <div class="d-grid gap-2 d-md-block">
             <a href="login.jsp" class="btn btn-primary btn-custom">Login</a>
             <a href="listprod.jsp" class="btn btn-success btn-custom">Begin Shopping</a>
             <a href="listorder.jsp" class="btn btn-info btn-custom">List All Orders</a>
             <a href="listCustOrder.jsp" class="btn btn-warning btn-custom">List All Orders for a Given Customer</a>
+            <a href="leaveAReview.jsp" class="btn btn-warning btn-custom">Leave a Review</a>
             <a href="customer.jsp" class="btn btn-secondary btn-custom">Customer Info</a>
             <a href="admin.jsp" class="btn btn-danger btn-custom">Administrators</a>
             <a href="logout.jsp" class="btn btn-dark btn-custom">Log out</a>

@@ -23,7 +23,7 @@
             // Get product name to search for
             String productId = request.getParameter("productId");
 
-            // TODO: Retrieve and display info for the product
+            // Retrieve and display product info
             String sql = "SELECT * FROM product WHERE productId = ?";
 
             try (Connection con = DriverManager.getConnection(url, uid, pw);) {
@@ -54,7 +54,7 @@
                     out.println("<p><b>SKU (Product ID): </b> " + productId + "</p>");
                     out.println("<p><b>Price: </b> " + currFormat.format(productPrice) + "</p>");
 
-                    // TODO: Add links to Add to Cart and Continue Shopping
+                    // Add links to Add to Cart and Continue Shopping
                     String addCartLink = "addcart.jsp?id=" + rs.getInt("productId") + "&name=" + rs.getString("productName") + "&price=" + rs.getDouble("productPrice");
                     out.println("<a href='" + addCartLink + "' class='btn btn-primary'>Add to Cart</a>");
                     out.println("<a href='listprod.jsp' class='btn btn-secondary ml-2'>Continue Shopping</a>");
@@ -64,6 +64,44 @@
                 } else {
                     out.println("<div class='alert alert-danger'>Product not found</div>");
                 }
+
+                // Retrieve and display product reviews
+                String reviewSql = "SELECT r.reviewRating, r.reviewDate, r.reviewComment, c.firstName, c.lastName " +
+                                   "FROM review r " +
+                                   "JOIN customer c ON r.customerId = c.customerId " +
+                                   "WHERE r.productId = ? " +
+                                   "ORDER BY r.reviewDate DESC";
+
+                try (PreparedStatement reviewPs = con.prepareStatement(reviewSql)) {
+                    reviewPs.setString(1, productId);
+                    ResultSet reviewRs = reviewPs.executeQuery();
+
+                    if (reviewRs.next()) {
+                        out.println("<hr><h3>Customer Reviews</h3>");
+                        out.println("<ul class='list-group'>");
+
+                        do {
+                            String reviewRating = reviewRs.getString("reviewRating");
+                            String reviewDate = reviewRs.getString("reviewDate");
+                            String reviewComment = reviewRs.getString("reviewComment");
+                            String firstName = reviewRs.getString("firstName");
+                            String lastName = reviewRs.getString("lastName");
+
+                            out.println("<li class='list-group-item'>");
+                            out.println("<b>" + firstName + " " + lastName + "</b><br>");
+                            out.println("<b>Rating:</b> " + reviewRating + " Stars<br>");
+                            out.println("<b>Reviewed on:</b> " + reviewDate + "<br>");
+                            out.println("<p>" + reviewComment + "</p>");
+                            out.println("</li>");
+
+                        } while (reviewRs.next());
+
+                        out.println("</ul>");
+                    } else {
+                        out.println("<p>No reviews yet for this product.</p>");
+                    }
+                }
+
             } catch (SQLException ex) {
                 out.println("<div class='alert alert-danger'>SQLException: " + ex + "</div>");
             }
