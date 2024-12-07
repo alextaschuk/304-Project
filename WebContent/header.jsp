@@ -12,9 +12,6 @@
                     <a class="nav-link" href="listprod.jsp">View Products</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="listorder.jsp">List All Orders</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="showcart.jsp">View Cart</a>
                 </li>
             </ul>

@@ -1,42 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-        <title>Sam and Alex's- Main Page</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <title>Sam and Alex's- Main Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        h1, h2, h3, h4 {
+            margin-bottom: 20px;
+        }
+        .btn-custom {
+            margin: 10px;
+        }
+    </style>
 </head>
 <body>
-  <%@ include file="header.jsp" %>
+    <%@ include file="header.jsp" %>
 
-<h1 align="center">Welcome to Sam and Alex's Grocery Depot</h1>
+    <div class="container text-center">
+        <h1>Welcome to Sam and Alex's Grocery Depot</h1>
 
-<h2 align="center"><a href="login.jsp">Login</a></h2>
+        <div class="d-grid gap-2 d-md-block">
+            <a href="login.jsp" class="btn btn-primary btn-custom">Login</a>
+            <a href="listprod.jsp" class="btn btn-success btn-custom">Begin Shopping</a>
+            <a href="listorder.jsp" class="btn btn-info btn-custom">List All Orders</a>
+            <a href="listCustOrder.jsp" class="btn btn-warning btn-custom">List All Orders for a Given Customer</a>
+            <a href="customer.jsp" class="btn btn-secondary btn-custom">Customer Info</a>
+            <a href="admin.jsp" class="btn btn-danger btn-custom">Administrators</a>
+            <a href="logout.jsp" class="btn btn-dark btn-custom">Log out</a>
+        </div>
 
-<h2 align="center"><a href="listprod.jsp">Begin Shopping</a></h2>
+        <%
+            String userName = (String) session.getAttribute("authenticatedUser");
+            session.setAttribute("loginMessage", "");
+            session.setAttribute("redirectedToLogin", false);
 
-<h2 align="center"><a href="listorder.jsp">List All Orders</a></h2>
+            if (userName != null) {
+                out.println("<h3>Signed in as: " + userName + "</h3>");
+            }
+        %>
 
-<h2 align="center"><a href="customer.jsp">Customer Info</a></h2>
-
-<h2 align="center"><a href="admin.jsp">Administrators</a></h2>
-
-<h2 align="center"><a href="logout.jsp">Log out</a></h2>
-
-<%
-	String userName = (String) session.getAttribute("authenticatedUser");
-  session.setAttribute("loginMessage", "");
-  session.setAttribute("redirectedToLogin", false);
-  
-
-	if (userName != null)
-		out.println("<h3 align=\"center\">Signed in as: "+userName+"</h3>");
-%>
-
-<h4 align="center"><a href="ship.jsp?orderId=1">Test Ship orderId=1</a></h4>
-
-<h4 align="center"><a href="ship.jsp?orderId=3">Test Ship orderId=3</a></h4>
-
+        <div class="mt-4">
+            <h4><a href="ship.jsp?orderId=1" class="btn btn-outline-primary">Test Ship orderId=1</a></h4>
+            <h4><a href="ship.jsp?orderId=3" class="btn btn-outline-primary">Test Ship orderId=3</a></h4>
+        </div>
+    </div>
 </body>
-</head>
-
-
+</html>
