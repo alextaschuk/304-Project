@@ -20,6 +20,8 @@
 
 <h2 align="center"><a href="admin.jsp">Administrators</a></h2>
 
+<h2 align="center"><a href="leaveAReview.jsp">Leave a Review</a></h2>
+
 <h2 align="center"><a href="logout.jsp">Log out</a></h2>
 
 <%
