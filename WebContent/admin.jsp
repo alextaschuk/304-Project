@@ -131,10 +131,60 @@
             out.println("<td>"+results.getString(2)+" "+results.getString(3)+"</td></tr>");
         }
         out.print("</table>");
+
+
+// List invertory by warehouse
+    
+
+    String query = "SELECT w.warehouseName, p.productName, pi.quantity " +
+               "FROM productinventory pi " +
+               "JOIN warehouse w ON pi.warehouseId = w.warehouseId " +
+               "JOIN product p ON pi.productId = p.productId " +
+               "ORDER BY w.warehouseId, p.productId;";
+    pstmt = con.prepareStatement(query);
+    results = pstmt.executeQuery();
+    out.println("<h1 align=\"center\">Warehouse Inventory</h1>");
+    out.println("<table border=\"1\" align=\"center\" style=\"border-collapse: collapse;\">");
+    out.println("<tr>");
+    out.println("<th style=\"width: 30%; text-align: center; vertical-align: middle;\">Warehouse Name</th>");
+    out.println("<th style=\"text-align: center; vertical-align: middle;\">Product name </th>");
+    out.println("<th style=\"text-align: center; vertical-align: middle;\">Product Inventory </th>");
+    out.println("</tr>");
+    while(results.next())
+	 {
+
+        String warehouseName = results.getString(1);
+        String productName = results.getString(2);
+        String quantity = results.getString(3);
+
+	    out.print("<tr style='border: 2px solid rgb(184, 184, 184)'>");
+        out.print("<td style='text-align: center; border: 2px solid rgb(184, 184, 184)'>"+ warehouseName +"</td>");
+	    out.print("<td style='text-align: center; border: 2px solid rgb(184, 184, 184)'>"+ productName +"</td>");
+        out.print("<td style='text-align: center; border: 2px solid rgb(184, 184, 184)'>"+ quantity +"</td>");
+
+
+        // Add the edit button
+        out.print("<td style='text-align: center; border: 2px solid rgb(184, 184, 184)'>");
+        out.print("<form action='editInventory.jsp' method='POST'>");
+        out.print("<input type='hidden' name='warehouseName' value='" + warehouseName + "' />");
+        out.print("<input type='hidden' name='productName' value='" + productName + "' />");
+        out.print("<input type='hidden' name='quantity' value='" + quantity + "' />");
+        out.print("<button type='submit'>Edit</button>");
+        out.print("</form>");
+        out.print("</td>");
+
+      out.println("</tr>");
+
+	 }
+    out.print("</table>");
+
+
     } catch (SQLException e) {
         out.println("Error: "+e);
     }   
-    %>
-</div>
+
+%>
+
+
 </body>
 </html>
