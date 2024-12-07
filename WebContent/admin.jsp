@@ -91,7 +91,7 @@
             <input type="submit" value="Add Product" class="btn">
         </form>
         <form method="get" action="deleteProduct.jsp">
-            <input type="submit" value="Delete Product" class="btn">
+            <input type="submit" value="Modify Product" class="btn">
         </form>
     </div>
 
