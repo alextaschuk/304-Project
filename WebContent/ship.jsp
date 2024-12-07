@@ -34,10 +34,10 @@
 	try {
 		con = DriverManager.getConnection(url, uid, pw);
 
-		// TODO: Start a transaction (turn-off auto-commit)
+		// Start a transaction (turn-off auto-commit)
 		con.setAutoCommit(false);
 		
-		// TODO: Retrieve all items in order with given id
+		// Retrieve all items in order with given id
 		String selectAllOrderProductsWithGivenId = "SELECT * FROM orderproduct WHERE orderId = ?";
 		PreparedStatement orderedProductsStatement = con.prepareStatement(selectAllOrderProductsWithGivenId);
 		orderedProductsStatement.setString(1, orderId);
@@ -47,14 +47,14 @@
 			throw new IllegalArgumentException("No products found for the given order ID.");
 		}
 
-		// TODO: Create a new shipment record.
+		// Create a new shipment record.
 		String createNewShipment = "INSERT INTO shipment (shipmentDate, warehouseId) VALUES (GETDATE(), 1)";
 		PreparedStatement pstmt = con.prepareStatement(createNewShipment, Statement.RETURN_GENERATED_KEYS);
 		pstmt.executeUpdate();
 
 
 
-		// TODO: For each item verify sufficient quantity available in warehouse 1.
+		// For each item verify sufficient quantity available in warehouse 1.
 		String getInventoryInWarehouse = "SELECT quantity FROM productinventory WHERE warehouseId = 1 AND productId = ?";
 		int inWarehouseInventory = 0;
 		int orderQuantityRequest = 0;
@@ -72,7 +72,7 @@
 			rs.next();
 			inWarehouseInventory = rs.getInt("quantity");
 
-			// TODO: If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
+			// If any item does not have sufficient inventory, cancel transaction and rollback. Otherwise, update inventory for each item.
 			if(inWarehouseInventory < orderQuantityRequest) throw new SQLException();
 			else {
 				newInventory = inWarehouseInventory - orderQuantityRequest;
