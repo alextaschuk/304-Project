@@ -10,7 +10,9 @@
 <%@ include file="jdbc.jsp" %>
 <%@ include file="header.jsp" %>
 
-
+<form method="get" action="createNewProduct.jsp">
+<input type="submit" value="Add Product">
+</form>
 <%
 
 String user = (String)session.getAttribute("authenticatedUser");
@@ -36,14 +38,28 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);) {
         out.println("</tr>");
     }
     out.println("</table>");
-}
-catch (SQLException e)
-{
-    out.println("Error: "+e);
-}
 
+// List all customers
+    String getCustomers = "SELECT customerId, firstName, lastName FROM customer";
+    PreparedStatement pstmt = con.prepareStatement(getCustomers);
+    ResultSet results = pstmt.executeQuery();
+    out.println("<h1 align=\"center\">All Customers</h1>");
+    out.println("<table border=\"1\" align=\"center\" style=\"border-collapse: collapse;\">");
+    out.println("<tr>");
+    out.println("<th style=\"width: 30%; text-align: center; vertical-align: middle;\">ID</th>");
+    out.println("<th style=\"text-align: center; vertical-align: middle;\">Customer Name</th>");
+    out.println("</tr>");
+    while(results.next())
+	 {
+	  out.print("<tr style='border: 2px solid rgb(184, 184, 184)'><td style='text-align: center; border: 2px solid rgb(184, 184, 184)'>"+results.getString(1)+"</td>");
+	  out.println("<td style='text-align: center; border: 2px solid rgb(184, 184, 184)'>"+results.getString(2)+" "+results.getString(3)+"</td></tr>");
+	 }
+    out.print("</table>");
+    }
+    catch (SQLException e) {
+        out.println("Error: "+e);
+    }   
 %>
-
 </body>
 </html>
 

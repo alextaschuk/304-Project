@@ -90,6 +90,7 @@ try (Connection con = DriverManager.getConnection(url, uid, pw);)
 				out.println("<input type=\"hidden\" name=\"id\" value=\"" + rs.getInt("productId") + "\">");
 				out.println("<input type=\"hidden\" name=\"name\" value=\"" + rs.getString("productName") + "\">");
 				out.println("<input type=\"hidden\" name=\"price\" value=\"" + rs.getDouble("productPrice") + "\">");
+				out.println("<input type=\"hidden\" name=\"description\"" + rs.getString("productDesc") + "\">");
 				out.println("<input type=\"submit\" value=\"Add to Cart\" class=\"btn btn-primary\">");
 				out.println("</form>");
 				out.println("</td>");
