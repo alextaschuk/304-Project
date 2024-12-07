@@ -3,6 +3,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.text.NumberFormat" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="java.sql.*" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF8"%>
 <!DOCTYPE html>
 <html>
@@ -12,7 +13,6 @@
 </head>
 <body>
 <%@ include file="header.jsp" %>
-
 
 <div class="container text-center mt-4">
     <h1 class="d-inline-flex align-items-center">
@@ -34,6 +34,15 @@ if (productList == null) {
 } else {
     NumberFormat currFormat = NumberFormat.getCurrencyInstance();
     double total = 0;
+    boolean hasError = false;
+    StringBuilder errorMessage = new StringBuilder();
+
+    // Display error message if it exists
+    String sessionErrorMessage = (String) session.getAttribute("errorMessage");
+    if (sessionErrorMessage != null) {
+        out.println("<div class='alert alert-danger mt-3'>" + sessionErrorMessage + "</div>");
+        session.removeAttribute("errorMessage");
+    }
 
     out.println("<form action=\"updatecart.jsp\" method=\"post\">");
     out.print("<table class=\"table\"><tr><th>Product Id</th><th>Product Name</th><th>Quantity</th><th>Price</th><th>Subtotal</th><th>Action</th></tr>");
@@ -51,6 +60,24 @@ if (productList == null) {
         String productName = (String) product.get(1);
         double price = Double.parseDouble(product.get(2).toString());
         int quantity = Integer.parseInt(product.get(3).toString());
+
+        // Check available inventory
+        int availableInventory = 0;
+        try (Connection con = DriverManager.getConnection("jdbc:sqlserver://cosc304_sqlserver:1433;DatabaseName=orders;TrustServerCertificate=True", "sa", "304#sa#pw");
+             PreparedStatement pstmt = con.prepareStatement("SELECT quantity FROM productinventory WHERE productId = ?")) {
+            pstmt.setString(1, productId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                availableInventory = rs.getInt("quantity");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (quantity > availableInventory) {
+            hasError = true;
+            errorMessage.append("Error: Only ").append(availableInventory).append(" units of ").append(productName).append(" are available.<br>");
+        }
 
         double subtotal = price * quantity;
         total += subtotal;
@@ -70,7 +97,9 @@ if (productList == null) {
     out.println("</table>");
 
     // Update Cart Button
-    out.println("<button type=\"submit\" class=\"btn btn-primary\">Update Cart</button>");
+    if (!hasError) {
+        out.println("<button type=\"submit\" class=\"btn btn-primary\">Update Cart</button>");
+    }
     out.println("</form>");
 
     // Checkout and Continue Shopping Buttons
@@ -78,6 +107,10 @@ if (productList == null) {
     out.println("<a href=\"checkout.jsp\" class=\"btn btn-success\">Checkout</a>");
     out.println("<a href=\"listprod.jsp\" class=\"btn btn-secondary\">Continue Shopping</a>");
     out.println("</div>");
+
+    if (hasError) {
+        out.println("<div class='alert alert-danger mt-3'>" + errorMessage.toString() + "</div>");
+    }
 }
 %>
 </body>
