@@ -9,7 +9,7 @@
 
 <html>
 <head>
-<title>Sam & Alex's Grocery Shipment Processing</title>
+<title>Sam & Alex's Plushie Emporium Processing</title>
 </head>
 <body>
         
